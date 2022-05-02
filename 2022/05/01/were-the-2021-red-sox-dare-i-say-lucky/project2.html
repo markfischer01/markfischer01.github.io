@@ -1,0 +1,853 @@
+
+
+
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
+## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+## ✓ readr   2.1.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(baseballr)
+library(ggrepel)
+library(ggalt)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggalt&#39;:
+##   method                  from   
+##   grid.draw.absoluteGrob  ggplot2
+##   grobHeight.absoluteGrob ggplot2
+##   grobWidth.absoluteGrob  ggplot2
+##   grobX.absoluteGrob      ggplot2
+##   grobY.absoluteGrob      ggplot2</code></pre>
+<pre class="r"><code>library(gt)</code></pre>
+<pre class="r"><code>ALWCbatting &lt;- read_csv(&quot;BostonALWCBatting.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<pre><code>## Rows: 16 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Name, PlayoffcWPA, RSGames
+## dbl (26): PlayoffGames, PlayoffABs, PlayoffRuns, PlayoffHits, Playoff2B, Pla...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>ALWCpitching &lt;- read_csv(&quot;BostonALWCPitching.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<pre><code>## Rows: 5 Columns: 28
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Name, PlayoffcWPA, RSGames
+## dbl (25): PlayoffGames, PlayoffGS, PlayoffERA, PlayoffW, PlayoffL, PlayoffSV...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>ALDSbatting &lt;- read_csv(&quot;BostonALDSBatting.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<pre><code>## Rows: 26 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Name, PlayoffcWPA, RSGames
+## dbl (26): PlayoffGames, PlayoffABs, PlayoffRuns, PlayoffHits, Playoff2B, Pla...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>ALDSpitching &lt;- read_csv(&quot;BostonALDSPitching.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<pre><code>## Rows: 13 Columns: 28
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Name, PlayoffcWPA, RSGames
+## dbl (25): PlayoffGames, PlayoffGS, PlayoffERA, PlayoffW, PlayoffL, PlayoffSV...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>ALCSbatting &lt;- read_csv(&quot;BostonALCSBatting.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<pre><code>## Rows: 26 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Name, PlayoffcWPA, RSGames
+## dbl (26): PlayoffGames, PlayoffABs, PlayoffRuns, PlayoffHits, Playoff2B, Pla...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>ALCSpitching &lt;- read_csv(&quot;BostonALCSPitching.csv&quot;) %&gt;% mutate(Season = 2021)</code></pre>
+<pre><code>## Rows: 13 Columns: 28
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): Name, PlayoffcWPA, RSGames
+## dbl (25): PlayoffGames, PlayoffGS, PlayoffERA, PlayoffW, PlayoffL, PlayoffSV...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting21 &lt;- read_csv(&quot;21TeamBatting.csv&quot;) %&gt;% mutate(Season = 2021) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 15 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching21 &lt;- read_csv(&quot;21TeamPitching.csv&quot;) %&gt;% mutate(Season = 2021) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 16 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting20 &lt;- read_csv(&quot;20teambatting.csv&quot;) %&gt;% mutate(Season = 2020)  %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching20 &lt;- read_csv(&quot;20teampitching.csv&quot;) %&gt;% mutate(Season = 2020) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting19 &lt;- read_csv(&quot;19teambatting.csv&quot;) %&gt;% mutate(Season = 2019) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching19 &lt;- read_csv(&quot;19teampitching.csv&quot;) %&gt;% mutate(Season = 2019) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting18 &lt;- read_csv(&quot;18teambatting.csv&quot;) %&gt;% mutate(Season = 2018) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching18 &lt;- read_csv(&quot;18teampitching.csv&quot;) %&gt;% mutate(Season = 2018) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting17 &lt;- read_csv(&quot;17teambatting.csv&quot;) %&gt;% mutate(Season = 2017) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching17 &lt;- read_csv(&quot;17teampitching.csv&quot;) %&gt;% mutate(Season = 2017) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting16 &lt;- read_csv(&quot;16teambatting.csv&quot;) %&gt;% mutate(Season = 2016) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching16 &lt;- read_csv(&quot;16teampitching.csv&quot;) %&gt;% mutate(Season = 2016) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting15 &lt;- read_csv(&quot;15teambatting.csv&quot;) %&gt;% mutate(Season = 2015) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching15 &lt;- read_csv(&quot;15teampitching.csv&quot;) %&gt;% mutate(Season = 2015) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting14 &lt;- read_csv(&quot;14teambatting.csv&quot;) %&gt;% mutate(Season = 2014) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching14 &lt;- read_csv(&quot;14teampitching.csv&quot;) %&gt;% mutate(Season = 2014) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting13 &lt;- read_csv(&quot;13teambatting.csv&quot;) %&gt;% mutate(Season = 2013) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching13 &lt;- read_csv(&quot;13teampitching.csv&quot;) %&gt;% mutate(Season = 2013) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>batting12 &lt;- read_csv(&quot;12teambatting.csv&quot;) %&gt;% mutate(Season = 2012) %&gt;% mutate (RPG = R/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 29
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (28): #Bat, BatAge, R/G, G, PA, AB, R, H, 2B, 3B, HR, RBI, SB, CS, BB, S...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pitching12 &lt;- read_csv(&quot;12teampitching.csv&quot;) %&gt;% mutate(Season = 2012) %&gt;% mutate (RPG = R/G, HPG = H/G)</code></pre>
+<pre><code>## Rows: 30 Columns: 36
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): Tm
+## dbl (35): #P, PAge, RA/G, W, L, W-L%, ERA, G, GS, GF, CG, tSho, cSho, SV, IP...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>teambatting &lt;- bind_rows(batting21, batting20, batting19, batting18, batting17, batting16, batting15, batting14, batting13, batting12)
+
+teampitching &lt;- bind_rows(pitching21, pitching20, pitching19, pitching18, pitching17, pitching16, pitching15, pitching14, pitching13, pitching12)
+
+alwcbat &lt;- ALWCbatting %&gt;% mutate(Name=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Name))
+
+alwcpitch &lt;- ALWCpitching %&gt;% mutate(Name=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Name))
+
+aldsbat &lt;- ALDSbatting %&gt;% mutate(Name=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Name))
+
+aldspitch &lt;- ALDSpitching %&gt;% mutate(Name=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Name))
+
+alcsbat &lt;- ALCSbatting %&gt;% mutate(Name=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Name))
+
+alcspitch &lt;- ALCSpitching %&gt;% mutate(Name=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Name))
+
+playoffbatting &lt;- bind_rows(alwcbat, aldsbat, alcsbat)
+
+playoffpitching &lt;- bind_rows(alwcpitch, aldspitch, alcspitch)
+
+teamBA &lt;- teambatting %&gt;% 
+  group_by(Tm, Season) %&gt;% 
+  select(Tm, Season, OBP, RPG)
+
+redsox &lt;- teamBA %&gt;% 
+  filter(Tm == &quot;Boston Red Sox&quot;)
+
+redsox21 &lt;- teamBA %&gt;% 
+  filter(Tm == &quot;Boston Red Sox&quot;) %&gt;% 
+  filter(Season == &quot;2021&quot;)
+
+redsoxchamp &lt;- teamBA %&gt;% 
+  filter(Tm == &quot;Boston Red Sox&quot;) %&gt;% 
+  filter(Season == &quot;2018&quot;) 
+
+redsoxchamp1 &lt;- teamBA %&gt;% 
+  filter(Tm == &quot;Boston Red Sox&quot;) %&gt;% 
+  filter(Season == &quot;2013&quot;)
+
+redsoxpitch &lt;- teampitching %&gt;% 
+  filter(Tm == &quot;Boston Red Sox&quot;) %&gt;%
+  select(Tm, Season, `RA/G`, HPG)
+
+bostonbatting &lt;- teambatting %&gt;% 
+  filter(Tm == &quot;Boston Red Sox&quot;) %&gt;%
+  filter(Season == &quot;2021&quot; | Season == &quot;2018&quot; | Season == &quot;2017&quot; | Season == &quot;2016&quot; | Season == &quot;2013&quot;) %&gt;%
+  select(Tm,Season, R, H, BA, OPS)</code></pre>
+<pre class="r"><code>ggplot() + geom_point(data=teamBA, aes(x=OBP, y=RPG), color = &quot;light grey&quot;) +
+  geom_point(data = redsox, aes(x=OBP, y=RPG), color = &quot;#BD3039&quot;) +
+  geom_point(data = redsoxchamp, aes(x=OBP, y=RPG), color = &quot;gold&quot;) +
+  geom_point(data = redsoxchamp1, aes(x=OBP, y=RPG), color = &quot;gold&quot;) +
+  geom_text_repel(data = redsox21, aes(x=OBP, y=RPG, label=Season), color = &quot;black&quot;) +
+  geom_text_repel(data = redsoxchamp, aes(x=OBP, y=RPG, label=Season), color = &quot;black&quot;) +
+  geom_text_repel(data = redsoxchamp1, aes(x=OBP, y=RPG, label=Season), color = &quot;black&quot;) +
+  geom_vline(xintercept = .32) +
+  geom_hline(yintercept = 4.5) +
+  theme_minimal() +
+  labs(title=&quot;The 2021 Red Sox ... Were They Lucky?&quot;, subtitle = &quot;The Red Sox usually live in the postseason, but were their stats in 2021 up to par with thier other
+postseason runs?&quot;,  x=&quot;On Base Percentage&quot;, y=&quot;Runs per Game&quot;, caption = &quot;By: Mark Fischer | Source: Baseball Reference&quot;) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="/post/2022-05-01-were-the-2021-red-sox-dare-i-say-lucky/project2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>ggplot() + 
+  geom_dumbbell(
+    data=redsoxpitch, 
+    aes(y=reorder(Season, `RA/G`), x=`RA/G`, xend=HPG),
+    size = 2,
+    colour = &quot;grey&quot;,
+    colour_x = &quot;#BD3039&quot;,
+    colour_xend = &quot;#0C2340&quot;) +
+  theme_minimal() +
+  labs(title=&quot;Pitching Tells the Same Story&quot;, subtitle = &quot;On a per game basis, the Red Sox gave up more runs(red) and more hits(blue) 
+in 2021 than they did in their World Series runs.&quot;,  x=&quot;&quot;, y=&quot;&quot;, caption = &quot;By: Mark Fischer | Source: Baseball Reference&quot;) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    )</code></pre>
+<p><img src="/post/2022-05-01-were-the-2021-red-sox-dare-i-say-lucky/project2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>bostonbatting %&gt;% 
+  gt() %&gt;% 
+  cols_label(
+    Tm = &quot;Team&quot;,
+    Season = &quot;Season&quot;,
+    R = &quot;Runs&quot;,
+    H = &quot;Hits&quot;,
+    BA = &quot;BA&quot;,
+    OPS = &quot;OPS&quot;
+  ) %&gt;%
+  tab_header(
+    title = &quot;You Gotta Score to Win&quot;,
+    subtitle = &quot;The 2021 Red Sox matched up with previous World Series teams except in the runs category.&quot;
+  ) %&gt;% tab_style(
+    style = cell_text(color = &quot;black&quot;, weight = &quot;bold&quot;, align = &quot;left&quot;),
+    locations = cells_title(&quot;title&quot;)
+  ) %&gt;% tab_style(
+    style = cell_text(color = &quot;black&quot;, align = &quot;left&quot;),
+    locations = cells_title(&quot;subtitle&quot;)
+  ) %&gt;%
+  tab_source_note(
+    source_note = md(&quot;**By:** Mark Fischer  |  **Source:** Baseball Reference&quot;)
+  ) %&gt;%
+  tab_style(
+     locations = cells_column_labels(columns = everything()),
+     style = list(
+       cell_borders(sides = &quot;bottom&quot;, weight = px(4)),
+       cell_text(weight = &quot;bold&quot;, size=12)
+     )
+   ) %&gt;%
+  opt_row_striping() %&gt;% 
+  opt_table_lines(&quot;none&quot;) %&gt;%
+    tab_style(
+      style = list(
+        cell_fill(color = &quot;#BD3039&quot;),
+        cell_text(color = &quot;#0C2340&quot;)
+       ),
+      locations = cells_body(
+       rows = Season == &quot;2018&quot;)
+   ) %&gt;%
+    tab_style(
+      style = list(
+        cell_fill(color = &quot;#BD3039&quot;),
+        cell_text(color = &quot;#0C2340&quot;)
+       ),
+      locations = cells_body(
+       rows = Season == &quot;2013&quot;)
+   )</code></pre>
+<div id="ndlrifmktb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ndlrifmktb .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: none;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ndlrifmktb .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ndlrifmktb .gt_bottom_border {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_col_headings {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ndlrifmktb .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ndlrifmktb .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ndlrifmktb .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ndlrifmktb .gt_column_spanner {
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ndlrifmktb .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ndlrifmktb .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ndlrifmktb .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ndlrifmktb .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ndlrifmktb .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: none;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ndlrifmktb .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ndlrifmktb .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ndlrifmktb .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ndlrifmktb .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ndlrifmktb .gt_first_summary_row {
+  border-top-style: none;
+  border-top-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ndlrifmktb .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ndlrifmktb .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: none;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ndlrifmktb .gt_table_body {
+  border-top-style: none;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ndlrifmktb .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ndlrifmktb .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ndlrifmktb .gt_left {
+  text-align: left;
+}
+
+#ndlrifmktb .gt_center {
+  text-align: center;
+}
+
+#ndlrifmktb .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ndlrifmktb .gt_font_normal {
+  font-weight: normal;
+}
+
+#ndlrifmktb .gt_font_bold {
+  font-weight: bold;
+}
+
+#ndlrifmktb .gt_font_italic {
+  font-style: italic;
+}
+
+#ndlrifmktb .gt_super {
+  font-size: 65%;
+}
+
+#ndlrifmktb .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#ndlrifmktb .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ndlrifmktb .gt_slash_mark {
+  font-size: 0.7em;
+  line-height: 0.7em;
+  vertical-align: 0.15em;
+}
+
+#ndlrifmktb .gt_fraction_numerator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: 0.45em;
+}
+
+#ndlrifmktb .gt_fraction_denominator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: -0.05em;
+}
+</style>
+<table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="6" class="gt_heading gt_title gt_font_normal" style="color: #000000; text-align: left; font-weight: bold;">You Gotta Score to Win</th>
+    </tr>
+    <tr>
+      <th colspan="6" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="color: #000000; text-align: left;">The 2021 Red Sox matched up with previous World Series teams except in the runs category.</th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;">Team</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;">Season</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;">Runs</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;">Hits</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;">BA</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="border-bottom-width: 4px; border-bottom-style: solid; border-bottom-color: #000000; font-size: 12; font-weight: bold;">OPS</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">Boston Red Sox</td>
+<td class="gt_row gt_right">2021</td>
+<td class="gt_row gt_right">829</td>
+<td class="gt_row gt_right">1434</td>
+<td class="gt_row gt_right">0.261</td>
+<td class="gt_row gt_right">0.777</td></tr>
+    <tr><td class="gt_row gt_left gt_striped" style="background-color: #BD3039; color: #0C2340;">Boston Red Sox</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #BD3039; color: #0C2340;">2018</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #BD3039; color: #0C2340;">876</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #BD3039; color: #0C2340;">1509</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #BD3039; color: #0C2340;">0.268</td>
+<td class="gt_row gt_right gt_striped" style="background-color: #BD3039; color: #0C2340;">0.792</td></tr>
+    <tr><td class="gt_row gt_left">Boston Red Sox</td>
+<td class="gt_row gt_right">2017</td>
+<td class="gt_row gt_right">785</td>
+<td class="gt_row gt_right">1461</td>
+<td class="gt_row gt_right">0.258</td>
+<td class="gt_row gt_right">0.736</td></tr>
+    <tr><td class="gt_row gt_left gt_striped">Boston Red Sox</td>
+<td class="gt_row gt_right gt_striped">2016</td>
+<td class="gt_row gt_right gt_striped">878</td>
+<td class="gt_row gt_right gt_striped">1598</td>
+<td class="gt_row gt_right gt_striped">0.282</td>
+<td class="gt_row gt_right gt_striped">0.810</td></tr>
+    <tr><td class="gt_row gt_left" style="background-color: #BD3039; color: #0C2340;">Boston Red Sox</td>
+<td class="gt_row gt_right" style="background-color: #BD3039; color: #0C2340;">2013</td>
+<td class="gt_row gt_right" style="background-color: #BD3039; color: #0C2340;">853</td>
+<td class="gt_row gt_right" style="background-color: #BD3039; color: #0C2340;">1566</td>
+<td class="gt_row gt_right" style="background-color: #BD3039; color: #0C2340;">0.277</td>
+<td class="gt_row gt_right" style="background-color: #BD3039; color: #0C2340;">0.795</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="6"><strong>By:</strong> Mark Fischer  |  <strong>Source:</strong> Baseball Reference</td>
+    </tr>
+  </tfoot>
+  
+</table>
+</div>
